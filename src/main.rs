@@ -3,16 +3,27 @@ use std::sync::LazyLock;
 use axum::{response, routing, Router};
 use serde_json::{json, Value};
 
-const ENDPOINT: &str = "/osmosis/poolmanager/pools/1/prices";
+const ENDPOINTS: [&str; 2] = [
+    "/osmosis/poolmanager/pools/1/prices",
+    "/osmosis/poolmanager/pools/2/prices",
+];
 
-static RESPONSE: LazyLock<Value> = LazyLock::new(|| json!({ "spot_price": "2elder" }));
+static RESPONSES: LazyLock<[Value; 2]> = LazyLock::new(|| {
+    [
+        json!({ "spot_price": "2elder" }),
+        json!({ "spot_price": "4elder"}),
+    ]
+});
 
 #[tokio::main]
 async fn main() {
-    let app = Router::new().route(
-        ENDPOINT,
-        routing::get(|| async { response::Json(&*RESPONSE) }),
-    );
+    let mut app = Router::new();
+    for (endpoint, response) in ENDPOINTS.into_iter().zip(RESPONSES.iter()) {
+        app = app.route(
+            endpoint,
+            routing::get(|| async { response::Json(response.clone()) }),
+        )
+    }
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8191").await.unwrap();
 
