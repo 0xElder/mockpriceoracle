@@ -10,8 +10,8 @@ const ENDPOINTS: [&str; 2] = [
 
 static RESPONSES: LazyLock<[Value; 2]> = LazyLock::new(|| {
     [
-        json!({ "spot_price": "2elder" }),
-        json!({ "spot_price": "4elder"}),
+        json!({ "spot_price": "2uelder" }),
+        json!({ "spot_price": "4uelder"}),
     ]
 });
 
